@@ -31,6 +31,6 @@ else:
     MONGO_DB = 'heroku_kk8c9mdc'
 print(MONGODB_URL)
 
-database_name = 'mongo-db-test'
+database_name = MONGO_DB
 ticket_collection_name = "ticketEvents"
 
