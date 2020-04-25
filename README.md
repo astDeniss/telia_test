@@ -24,7 +24,10 @@ main.py - FastAPI application instance and api router including
 
 ## Project setup with Docker
 
-1. Build the Docker image
+1. Clone this repository
+
+
+2. Build the Docker image
 
 ```
 
@@ -33,7 +36,7 @@ docker-compose build
 ```
 
 
-2. Launching the service
+3. Launch the service
 
 ```
 
