@@ -40,10 +40,9 @@ docker-compose build
 docker-compose up
 
 ```
-This command looks for the `docker-compose.yaml` configuration file. If you want to use another configuration file,
-it can be specified with the `-f` switch.
 
-## Available endpoints (once the container is running):
+
+## Available endpoints:
 ```
 1. localhost:8000/tickets
 Request method: POST
