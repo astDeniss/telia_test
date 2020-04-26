@@ -59,7 +59,7 @@ async def create_new_ticket(new_ticket: TicketCreateRequest = Body(..., embed=Fa
             )
         )
 
-        print(ticket.dict())
+        # print(ticket.dict())
 
         await db[database_name][ticket_collection_name].insert_one(ticket.dict())
 
@@ -84,7 +84,7 @@ async def get_ticket_by_ticketId(ticketId: str = Path(..., min_length=1),
                    f"is of the right UUID format"
         )
 
-    print(ticketId)
+    # print(ticketId)
     ticket = await db[database_name][ticket_collection_name].find_one({'ticketId': UUID(ticketId)})
 
     if not ticket:
@@ -109,9 +109,9 @@ async def get_tickets(
         assignee: Optional[constr(max_length=80)] = None,
         db: AsyncIOMotorClient = Depends(get_database),
 ):
-    tickets: ManyTicketsResponse = []
+    tickets: [ManyTicketsResponse] = []
 
-    print('check if assignee or status params are present')
+    # print('check if assignee or status params are present')
     if assignee == None and status == None:
         ticket_docs = db[database_name][ticket_collection_name].find({}, limit=limit, skip=offset)
     elif assignee and status:
@@ -122,9 +122,11 @@ async def get_tickets(
     elif assignee:
         ticket_docs = db[database_name][ticket_collection_name].find({'assignee': assignee}, limit=limit, skip=offset)
 
-    print('Convert Dict objects retreived from db to Tickets Object')
+    # print('Convert Dict objects retreived from db to Tickets Object')
     async for ticket in ticket_docs:
-        print(type(ticket))
+
+        # print(type(ticket))
+
         tickets.append(
             Ticket(
                 **ticket
@@ -141,7 +143,7 @@ async def get_tickets(
 async def update_ticket(ticketId: str = Path(..., min_length=1),
                         ticket_update: TicketUpdateRequest = Body(..., embed=False),
                         db: AsyncIOMotorClient = Depends(get_database),):
-    print(ticketId)
+    # print(ticketId)
 
     if len(ticketId) != 36:
         raise HTTPException(
@@ -165,7 +167,7 @@ async def update_ticket(ticketId: str = Path(..., min_length=1),
         )
 
     if ticket_update.assignee is not None:
-        print(ticket_update.status)
+        # print(ticket_update.status)
         if ticket_update.status is not EventStatusEnum.assigned:
             raise HTTPException(
                 status_code=HTTP_409_CONFLICT,
@@ -185,16 +187,16 @@ async def update_ticket(ticketId: str = Path(..., min_length=1),
 
     ticket = Ticket(**ticket)
 
-    print('Check if description')
+    # print('Check if description')
     if ticket_update.description:
         ticket.description = ticket_update.description
-    print('Check if status')
+    # print('Check if status')
     if ticket_update.status:
         ticket.status = ticket_update.status
-    print('Check if title')
+    # print('Check if title')
     if ticket_update.title:
         ticket.title = ticket_update.title
-    print('Check if comment')
+    # print('Check if comment')
     if ticket_update.comment:
         ticket.comments.append(
             TicketComment(
@@ -203,10 +205,10 @@ async def update_ticket(ticketId: str = Path(..., min_length=1),
                 comment=ticket_update.comment
             )
         )
-    print('Check if assignee')
+    # print('Check if assignee')
     if ticket_update.assignee:
         ticket.assignee = ticket_update.assignee
-    print('Add to History')
+    # print('Add to History')
     ticket.history.append(
         TicketEvent(
             event=TicketEventData(**ticket_update.dict()),
