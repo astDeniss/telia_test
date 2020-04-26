@@ -1,4 +1,4 @@
-from pydantic import BaseConfig, BaseModel, constr, UUID4
+from pydantic import BaseModel, constr, UUID4
 from typing import List, Optional
 from datetime import datetime
 from enum import Enum
@@ -63,7 +63,7 @@ class TicketCreateResponse(TicketCreateRequest):
 
 
 class TicketUpdateRequest(BaseModel):
-    author: Optional[constr(max_length=50)]
+    author: constr(max_length=50)
     description: Optional[constr(max_length=5000)]
     status: Optional[EventStatusEnum] = 'assigned'
     title: Optional[constr(max_length=200)]
@@ -71,7 +71,7 @@ class TicketUpdateRequest(BaseModel):
     assignee: Optional[constr(max_length=80)]
 
 
-class TicketUpdateResponse(TicketCreateRequest):
+class TicketUpdateResponse(TicketUpdateRequest):
     ticketId: UUID4
 
 

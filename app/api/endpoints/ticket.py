@@ -1,13 +1,11 @@
 from typing import Optional
 from datetime import datetime
-from fastapi import APIRouter, Body, Depends, Path, Query
+from fastapi import APIRouter, Body, Depends, Path
 
 from starlette.exceptions import HTTPException
 from starlette.status import (
     HTTP_201_CREATED,
     HTTP_409_CONFLICT,
-    HTTP_204_NO_CONTENT,
-    HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
     HTTP_422_UNPROCESSABLE_ENTITY,
     HTTP_200_OK
@@ -32,7 +30,7 @@ router = APIRouter()
              response_model=TicketCreateResponse,
              tags=["tickets"],
              status_code=HTTP_201_CREATED,)
-async def create_new_ticket(new_ticket: TicketCreateRequest = Body(..., embed=True),
+async def create_new_ticket(new_ticket: TicketCreateRequest = Body(..., embed=False),
                             db: AsyncIOMotorClient = Depends(get_database),):
     try:
         ticket_dict = new_ticket.dict()
@@ -78,6 +76,14 @@ async def create_new_ticket(new_ticket: TicketCreateRequest = Body(..., embed=Tr
             status_code=HTTP_200_OK,)
 async def get_ticket_by_ticketId(ticketId: str = Path(..., min_length=1),
                                  db: AsyncIOMotorClient = Depends(get_database),):
+
+    if len(ticketId) != 36:
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail=f"ticket with TicketId '{ticketId}' not found. Please check if the TickedId "
+                   f"is of the right UUID format"
+        )
+
     print(ticketId)
     ticket = await db[database_name][ticket_collection_name].find_one({'ticketId': UUID(ticketId)})
 
@@ -130,12 +136,20 @@ async def get_tickets(
 
 
 @router.patch("/tickets/{ticketId}",
-              response_model=Ticket,
+              response_model=TicketUpdateResponse,
               tags=["tickets"])
 async def update_ticket(ticketId: str = Path(..., min_length=1),
-                        ticket_update: TicketUpdateRequest = Body(..., embed=True),
+                        ticket_update: TicketUpdateRequest = Body(..., embed=False),
                         db: AsyncIOMotorClient = Depends(get_database),):
     print(ticketId)
+
+    if len(ticketId) != 36:
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail=f"ticket with TicketId '{ticketId}' not found. Please check if the TickedId "
+                   f"is of the right UUID format"
+        )
+
     ticket = await db[database_name][ticket_collection_name].find_one({'ticketId': UUID(ticketId)})
 
     if not ticket:
