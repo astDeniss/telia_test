@@ -29,9 +29,9 @@ router = APIRouter()
 @router.post("/tickets",
              response_model=TicketCreateResponse,
              tags=["tickets"],
-             status_code=HTTP_201_CREATED,)
+             status_code=HTTP_201_CREATED, )
 async def create_new_ticket(new_ticket: TicketCreateRequest = Body(..., embed=False),
-                            db: AsyncIOMotorClient = Depends(get_database),):
+                            db: AsyncIOMotorClient = Depends(get_database), ):
     try:
         ticket_dict = new_ticket.dict()
         ticket_dict['ticketId'] = uuid.uuid4()
@@ -73,10 +73,9 @@ async def create_new_ticket(new_ticket: TicketCreateRequest = Body(..., embed=Fa
 @router.get("/tickets/{ticketId}",
             response_model=Ticket,
             tags=["tickets"],
-            status_code=HTTP_200_OK,)
+            status_code=HTTP_200_OK, )
 async def get_ticket_by_ticketId(ticketId: str = Path(..., min_length=1),
-                                 db: AsyncIOMotorClient = Depends(get_database),):
-
+                                 db: AsyncIOMotorClient = Depends(get_database), ):
     if len(ticketId) != 36:
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND,
@@ -95,6 +94,10 @@ async def get_ticket_by_ticketId(ticketId: str = Path(..., min_length=1),
 
     return create_aliased_response(Ticket(**ticket))
 
+
+@router.get("/hello_world/{language}")
+def hello_world(language):
+    return f"Hello {language}"
 
 @router.get(
     "/tickets",
@@ -124,7 +127,6 @@ async def get_tickets(
 
     # print('Convert Dict objects retreived from db to Tickets Object')
     async for ticket in ticket_docs:
-
         # print(type(ticket))
 
         tickets.append(
@@ -142,7 +144,7 @@ async def get_tickets(
               tags=["tickets"])
 async def update_ticket(ticketId: str = Path(..., min_length=1),
                         ticket_update: TicketUpdateRequest = Body(..., embed=False),
-                        db: AsyncIOMotorClient = Depends(get_database),):
+                        db: AsyncIOMotorClient = Depends(get_database), ):
     # print(ticketId)
 
     if len(ticketId) != 36:
